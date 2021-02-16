@@ -3,7 +3,6 @@ Instruction to setup the dev environment
 2. Install Apache Netbeans IDE 11.3 https://netbeans.apache.org/download/nb113/nb113.html
 3. Install MySQL Workbench 8.0 CE  https://dev.mysql.com/downloads/installer/
 
-
 Setup the database and table
 1. Open MySQL Workbench
 2. Execute the following query to create the database and table.
