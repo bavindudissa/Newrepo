@@ -1,0 +1,335 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package readtext_sendemail;
+
+
+
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.swing.table.DefaultTableModel;
+
+
+/**
+ *
+ * @author Bavindu
+ */
+public class Display_Table extends javax.swing.JFrame {
+
+  
+    
+        private static Connection Connection() throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection cn = (Connection)
+        // Change the user and password credentials in the below string accordingly 
+        DriverManager.getConnection("jdbc:mysql://localhost:3306/readfile","root","aaaaaaaaaa1.");
+        
+        
+        return cn; }
+        
+        public static void readtext(File mail) throws FileNotFoundException, IOException{
+            
+        FileReader file = new FileReader(mail);
+        BufferedReader read = new BufferedReader(file);
+        
+        String line;
+        
+        while((line = read.readLine()) !=null){
+            String [] newString = line.split("\\,+");
+            
+            for (int ss =0; ss<1 ;ss++){
+                 
+                String ToEmail = newString[0];
+                String Name = newString[1];
+                String Subject = newString[2];
+                String Body = newString[3];
+                String FromEmail = "bimsarabavindu62@gmail.com";
+                String FromEmailPassword = "Bimbabavi@";
+                String EmailStatus;
+                
+                
+                Properties properties = new Properties();
+                properties.put("mail.smtp.auth","true");
+                properties.put("mail.smtp.starttls.enable","true");
+                properties.put("mail.smtp.host","smtp.gmail.com");
+                properties.put("mail.smtp.port","587");
+                
+                
+                Session session = Session.getDefaultInstance(properties,new javax.mail.Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication(){
+                        return new PasswordAuthentication (FromEmail,FromEmailPassword);
+                    }
+       
+                });
+                
+                try{
+                    MimeMessage message = new MimeMessage(session);
+                    message.setFrom(new InternetAddress (FromEmail));
+                    message.addRecipient(Message.RecipientType.TO, new InternetAddress (ToEmail));
+                    message.setSubject(Subject);
+                    message.setText(Body);
+                    
+                    
+                    Transport.send(message);
+                    EmailStatus= "Sent";
+                    
+                }
+                catch(MessagingException ex){
+                   
+                     EmailStatus= "Failed";
+                }
+              
+                try {
+                    Connection conn = Connection();
+                    PreparedStatement State= conn.prepareStatement("INSERT INTO Email_Infor (Email,Subject,Message,Send_Date_Time,Send_Status) VALUES (?,?,?,CURRENT_TIMESTAMP,?)");
+                    
+                    State.setString(1,ToEmail);
+                    State.setString(2,Subject);
+                    State.setString(3,Body);
+                    State.setString(4,EmailStatus);
+                    
+                    State.executeUpdate();
+                    
+                    
+                    
+                } catch (ClassNotFoundException | SQLException ex) {
+                    Logger.getLogger(ReadText_SendEmail.class.getName()).log(Level.SEVERE, null, ex);
+                }
+               
+                
+            }   
+            
+        }
+    }
+    
+        
+    
+    /**
+     * Creates new form Display_Table
+     */
+    public Display_Table() {
+        initComponents();
+        jTable1.setVisible(false);
+        jButton1.setVisible(false);
+        jLabel1.setVisible(false);
+    }
+    
+   
+    
+    
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Email", "Subject", "Message", "Send Date Time", "Send Status"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jScrollPane1.setViewportView(jTable1);
+
+        jButton1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jButton1.setText(" View Mail Table");
+        jButton1.setToolTipText("");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jButton2.setText("Read Text File & Send Mail");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 10)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(51, 204, 0));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText(" Email Sent Successfully...");
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 381, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        
+          
+        jTable1.setVisible(true);
+        
+        
+        
+        
+         try {
+            Connection conn;
+            conn = Connection();
+            String query ="SELECT * FROM Email_Infor";
+            try (Statement st = conn.createStatement()) {
+                ResultSet rs = st.executeQuery(query);
+                
+                
+                while(rs.next()){
+                    String id = String.valueOf(rs.getInt("Id"));
+                    String email = rs.getString("Email");
+                    String subject = rs.getString("Subject");
+                    String body = rs.getString("Message");
+                    String time = rs.getString("Send_Date_Time");
+                    String status = rs.getString("Send_Status");
+                  
+                    String tblData [] = {id,email,subject,body,time,status};
+                    DefaultTableModel tblModel = (DefaultTableModel)jTable1.getModel();
+                   
+                    tblModel.addRow(tblData);
+                }
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(ReadText_SendEmail.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+         
+         
+         //Change the .txt file path accordingly 
+         File text = new File ("email.txt");
+            try {
+                 DefaultTableModel tblModel = (DefaultTableModel)jTable1.getModel();
+                 tblModel.setRowCount(0);
+                 jTable1.setVisible(false);
+                 readtext(text);
+                 jLabel1.setVisible(true);
+                 jButton1.setVisible(true);
+              
+            } catch (IOException ex) {
+                Logger.getLogger(Display_Table.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+          
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        
+         
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Display_Table.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+            //</editor-fold>
+            
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> {
+            new Display_Table().setVisible(true);
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
+    // End of variables declaration//GEN-END:variables
+}
